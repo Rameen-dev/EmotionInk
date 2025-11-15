@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EmotionInk</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --font-sans: 'Inter', sans-serif;
+        --font-display: 'Orbitron', sans-serif;
+        --font-serif: 'Lora', serif;
+      }
+      body {
+        font-family: var(--font-sans);
+      }
+      .font-display { font-family: var(--font-display); }
+      .font-serif { font-family: var(--font-serif); }
+      
+      .text-glow-fuchsia {
+        text-shadow: 0 0 8px rgba(217, 70, 239, 0.6), 0 0 16px rgba(192, 38, 211, 0.4);
+      }
+      .text-glow-cyan {
+        text-shadow: 0 0 8px rgba(34, 211, 238, 0.6), 0 0 16px rgba(20, 184, 166, 0.4);
+      }
+      .text-glow-amber {
+          text-shadow: 0 0 6px rgba(251, 191, 36, 0.7), 0 0 12px rgba(245, 158, 11, 0.5);
+      }
+
+      .bg-gradient-fuchsia-indigo {
+        background-image: linear-gradient(to right, #d946ef, #4f46e5);
+      }
+       .bg-gradient-cyan-teal {
+        background-image: linear-gradient(to right, #22d3ee, #14b8a6);
+      }
+      .bg-gradient-amber-orange {
+          background-image: linear-gradient(to right, #fbbf24, #f97316);
+      }
+
+      .progress-bar {
+        transition: width 0.5s ease-in-out;
+      }
+
+      /* --- Cinematic Background & Particles --- */
+
+      .scene-container {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        overflow: hidden;
+        background-color: #0F172A; /* bg-slate-900 */
+      }
+      .scene-container::after { /* Vignette effect */
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.7) 100%);
+          pointer-events: none;
+      }
+
+      .scene-layer {
+          position: absolute;
+          inset: 0;
+          background-size: cover;
+          background-position: center;
+          opacity: 0;
+          transition: opacity 2s ease-in-out;
+      }
+      .scene-layer.active {
+          opacity: 1;
+      }
+      .scene-dark-forest {
+          background-color: #1a202c;
+          background-image:
+              radial-gradient(ellipse at bottom, #001e38 0%, transparent 60%),
+              linear-gradient(to top, rgba(15, 23, 42, 1) 0%, rgba(15, 23, 42, 0) 50%);
+      }
+      .scene-glowing-cave {
+          background-color: #2d1e3a;
+          background-image:
+              radial-gradient(circle at center, rgba(139, 92, 246, 0.2) 0%, transparent 70%),
+              radial-gradient(ellipse at top left, rgba(76, 29, 149, 0.4) 0%, transparent 50%),
+              radial-gradient(ellipse at bottom right, rgba(29, 78, 216, 0.3) 0%, transparent 50%);
+      }
+      .scene-starry-night {
+          background-color: #0c1445;
+          background-image:
+              radial-gradient(circle at top, rgba(255, 255, 255, 0.05) 0%, transparent 40%);
+      }
+       .scene-ruined-temple {
+          background-color: #3a3a4a;
+          background-image: 
+              linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.1)),
+              radial-gradient(ellipse at center, #5a5a6a 0%, transparent 70%);
+       }
+
+      /* Particle Keyframes */
+      @keyframes firefly-move {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        25% { transform: translate(var(--tx1), var(--ty1)) scale(0.8); }
+        50% { transform: translate(var(--tx2), var(--ty2)) scale(1.2); }
+        75% { transform: translate(var(--tx3), var(--ty3)) scale(0.9); }
+      }
+
+      @keyframes firefly-blink {
+        0%, 100% { opacity: 0.2; }
+        50% { opacity: 1; }
+      }
+
+      .firefly {
+        animation: firefly-move var(--d1) infinite, firefly-blink var(--d2) infinite;
+      }
+
+      @keyframes fog-drift {
+        0% { transform: translateX(-100%); opacity: 0; }
+        25%, 75% { opacity: var(--opacity, 0.4); }
+        100% { transform: translateX(100%); opacity: 0; }
+      }
+
+       .fog-layer {
+        animation: fog-drift var(--duration) linear infinite;
+      }
+      
+      @keyframes falling-leaf {
+        0% { transform: translateY(-10%) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(110vh) rotate(var(--r-end)); opacity: 0; }
+      }
+      
+      .leaf {
+        animation: falling-leaf var(--d) linear infinite;
+      }
+
+      @keyframes flicker-shadows {
+        0%, 100% { opacity: 0.1; }
+        50% { opacity: 0.3; }
+      }
+
+      .shadow-overlay {
+        animation: flicker-shadows 6s ease-in-out infinite;
+      }
+      
+      /* Demo Guide animation */
+      @keyframes fade-in {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      .animate-fade-in {
+        animation: fade-in 0.3s ease-in-out forwards;
+      }
+
+      /* Character sketch wobble animation */
+      .animate-sketch-wobble {
+        filter: url(#sketch-filter);
+      }
+
+      /* Character portrait glossy background */
+      .character-portrait-bg {
+        background-color: rgba(14, 19, 36, 0.3); /* Made more transparent */
+        position: relative;
+        overflow: hidden;
+        -webkit-backdrop-filter: blur(8px); /* Increased blur for a glassier effect */
+        backdrop-filter: blur(8px);
+      }
+      .character-portrait-bg::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: 
+          radial-gradient(circle at center, 
+              rgba(168, 85, 247, 0.25) 0%, /* fuchsia, stronger opacity */
+              rgba(99, 102, 241, 0.2) 35%,  /* indigo, stronger opacity */
+              transparent 70%
+          ),
+          radial-gradient(circle at 25% 75%,
+              rgba(56, 189, 248, 0.15) 0%, /* light blue */
+              transparent 50%
+          );
+        animation: rotate-gloss 15s linear infinite; /* Sped up animation */
+        z-index: 0;
+      }
+
+      @keyframes rotate-gloss {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      /* Audio pulse animation */
+      @keyframes speaking-pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(217, 70, 239, 0.7); /* fuchsia-500 */
+        }
+        70% {
+            box-shadow: 0 0 0 8px rgba(217, 70, 239, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(217, 70, 239, 0);
+        }
+      }
+
+      .animate-speaking-pulse {
+          animation: speaking-pulse 1.5s infinite;
+      }
+
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+  }
+}
+</script>
+</head>
+  <body class="bg-slate-900 text-slate-100">
+    <div id="root"></div>
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <filter id="sketch-filter">
+          <feTurbulence type="fractalNoise" baseFrequency="0.02 0.05" numOctaves="1" result="turbulence" seed="0">
+             <animate attributeName="baseFrequency" dur="6s" values="0.02 0.05;0.03 0.02;0.02 0.05" repeatCount="indefinite"></animate>
+          </feTurbulence>
+          <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="3" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+        </filter>
+      </defs>
+    </svg>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "name": "EmotionInk",
+  "description": "An AI engine that turns hand-drawn characters into emotionally reactive beings living inside evolving story worlds. Upload a drawing to begin, then chat with your creation to see their emotions and story unfold.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
